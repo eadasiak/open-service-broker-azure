@@ -17,7 +17,7 @@ import (
 	redisSDK "github.com/Azure/azure-sdk-for-go/services/redis/mgmt/2017-10-01/redis"
 	resourcesSDK "github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2017-05-10/resources"
 	servicebusSDK "github.com/Azure/azure-sdk-for-go/services/servicebus/mgmt/2017-04-01/servicebus"
-	storageSDK "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2017-10-01/storage"
+	storageSDK "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2019-04-01/storage"
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/Azure/open-service-broker-azure/pkg/azure"
 	"github.com/Azure/open-service-broker-azure/pkg/azure/arm"
@@ -243,6 +243,20 @@ func getModules(
 	storageAccountsClient.Authorizer = authorizer
 	storageAccountsClient.UserAgent = getUserAgent(storageAccountsClient.Client)
 
+	storageManagementPoliciesClient := storageSDK.NewManagementPoliciesClientWithBaseURI(
+		azureConfig.Environment.ResourceManagerEndpoint,
+		azureSubscriptionID,
+	)
+	storageManagementPoliciesClient.Authorizer = authorizer
+	storageManagementPoliciesClient.UserAgent = getUserAgent(storageManagementPoliciesClient.Client)
+
+	storageBlobServicesClient := storageSDK.NewBlobServicesClientWithBaseURI(
+		azureConfig.Environment.ResourceManagerEndpoint,
+		azureSubscriptionID,
+	)
+	storageBlobServicesClient.Authorizer = authorizer
+	storageBlobServicesClient.UserAgent = getUserAgent(storageBlobServicesClient.Client)
+
 	modules := []service.Module{
 		postgresql.New(
 			armDeployer,
@@ -282,7 +296,7 @@ func getModules(
 			sqlFailoverGroupsClient,
 		),
 		cosmosdb.New(armDeployer, cosmosdbAccountsClient),
-		storage.New(armDeployer, storageAccountsClient),
+		storage.New(armDeployer, storageAccountsClient, storageBlobServicesClient, storageManagementPoliciesClient),
 		textanalytics.New(armDeployer, cognitiveClient),
 		iothub.New(armDeployer, iotHubClient),
 		appinsights.New(armDeployer, appInsightsClient, appInsightsAPIKeyClient),
