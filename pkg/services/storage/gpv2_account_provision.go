@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	storageSDK "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2019-04-01/storage" // nolint: lll
 	"github.com/Azure/open-service-broker-azure/pkg/generate"
+	"github.com/Azure/open-service-broker-azure/pkg/ptr"
 	"github.com/Azure/open-service-broker-azure/pkg/service"
 	uuid "github.com/satori/go.uuid"
 )
@@ -20,15 +22,38 @@ func (gpv2m *generalPurposeV2Manager) GetProvisioner(
 }
 
 func (gpv2m *generalPurposeV2Manager) preProvision(
-	_ context.Context,
+	ctx context.Context,
 	instance service.Instance,
 ) (service.InstanceDetails, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	dt := instanceDetails{
 		ARMDeploymentName:  uuid.NewV4().String(),
 		StorageAccountName: generate.NewIdentifier(),
 	}
-	if instance.ProvisioningParameters.GetString("storageAccountName") != "" {
-		dt.StorageAccountName = instance.ProvisioningParameters.GetString("storageAccountName")
+	requestedName := instance.ProvisioningParameters.GetString("storageAccountName")
+	if requestedName != "" {
+		nameAvailability, err := gpv2m.accountsClient.CheckNameAvailability(
+			ctx,
+			storageSDK.AccountCheckNameAvailabilityParameters{
+				Name: &requestedName,
+				Type: ptr.ToString("Microsoft.Storage/storageAccounts"),
+			},
+		)
+		if err != nil {
+			return nil, fmt.Errorf(
+				"error with storage account name validation: %s",
+				err,
+			)
+		}
+		if *nameAvailability.NameAvailable {
+			dt.StorageAccountName = requestedName
+		} else {
+			return nil, fmt.Errorf(
+				"error with storage account name validation: %s",
+				*nameAvailability.Message,
+			)
+		}
 	}
 	return &dt, nil
 }
@@ -60,14 +85,6 @@ func (gpv2m *generalPurposeV2Manager) deployARMTemplate(
 		return nil, fmt.Errorf("error deploying ARM template: %s", err)
 	}
 
-	// accessKey, ok := outputs["accessKey"].(string)
-	// if !ok {
-	// 	return nil, fmt.Errorf(
-	// 		"error retrieving primary access key from deployment: %s",
-	// 		err,
-	// 	)
-	// }
-	// dt.AccessKey = accessKey
 	return dt, nil
 }
 
