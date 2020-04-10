@@ -53,8 +53,6 @@ func (b *blobServicesManager) unsetBlobServices(
 
 	newCorsRules := new([]storageSDK.CorsRule)
 
-	fmt.Printf("Blob Services Properties Properties Before:\n%+v\n", *blobProperties.BlobServicePropertiesProperties)
-
 	// Reset all the settings to nil
 	if blobProperties.BlobServicePropertiesProperties.Cors.CorsRules != nil {
 		blobProperties.BlobServicePropertiesProperties.Cors.CorsRules = newCorsRules
@@ -68,8 +66,6 @@ func (b *blobServicesManager) unsetBlobServices(
 	if blobProperties.BlobServicePropertiesProperties.AutomaticSnapshotPolicyEnabled != nil {
 		*blobProperties.BlobServicePropertiesProperties.AutomaticSnapshotPolicyEnabled = false
 	}
-
-	fmt.Printf("Blob Services Properties Properties After:\n%+v\n", *blobProperties.BlobServicePropertiesProperties)
 
 	_, err = b.blobServicesClient.SetServiceProperties(
 		ctx,
