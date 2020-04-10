@@ -79,6 +79,5 @@ func buildBlobServicesGoTemplate(
 	deleteRetentionPolicyBytes, _ := json.Marshal(deleteRetentionPolicy)
 	p["deleteRetentionPolicy"] = string(deleteRetentionPolicyBytes)
 	p["automaticSnapshotPolicyEnabled"] = parameter.GetString("automaticSnapshotPolicyEnabled")
-	fmt.Printf("template params:\n%+v\n", p)
 	return p
 }
