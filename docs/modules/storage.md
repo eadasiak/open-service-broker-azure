@@ -387,8 +387,8 @@ Sets blob services properties in a given GPv2 storage account.
 | `corsRules[n].exposedHeaders` | `array` | A list of response headers to expose to CORS clients | N | |
 | `corsRules[n].allowedHeaders` | `array` | A list of headers allowed to be part of the cross-origin request | N | |
 | `deleteRetentionPolicy` | `object` | The blob service properties for soft delete | N | |
-| `deleteRetentionPolicy.Enabled` | `string` | Indicates whether DeleteRetentionPolicy is enabled.  Allowed values are `true` or `false` | N | |
-| `deleteRetentionPolicy.Days` | `integer` | Indicates the number of days that the deleted blob should be retained (1 to 365) | N | |
+| `deleteRetentionPolicy.enabled` | `string` | Indicates whether DeleteRetentionPolicy is enabled.  Allowed values are `true` or `false` | N | |
+| `deleteRetentionPolicy.days` | `integer` | Indicates the number of days that the deleted blob should be retained (1 to 365) | N | |
 
 ##### Bind
 
@@ -423,8 +423,8 @@ Updates blob services settings within a GPv2 storage account.
 | `corsRules[n].exposedHeaders` | `array` | A list of response headers to expose to CORS clients | N |
 | `corsRules[n].allowedHeaders` | `array` | A list of headers allowed to be part of the cross-origin request | N |
 | `deleteRetentionPolicy` | `object` | The blob service properties for soft delete | N |
-| `deleteRetentionPolicy.Enabled` | `string` | Indicates whether DeleteRetentionPolicy is enabled.  Allowed values are `true` or `false` | N |
-| `deleteRetentionPolicy.Days` | `integer` | Indicates the number of days that the deleted blob should be retained (1 to 365) | N |
+| `deleteRetentionPolicy.enabled` | `string` | Indicates whether DeleteRetentionPolicy is enabled.  Allowed values are `true` or `false` | N |
+| `deleteRetentionPolicy.days` | `integer` | Indicates the number of days that the deleted blob should be retained (1 to 365) | N |
 
 ##### Deprovision
 
@@ -464,6 +464,10 @@ Creates a lifecycle management policy in a given GPv2 storage account.
 | `rules[n].definition.actions.snapshot` | `object` | Blob snapshot actions | N | |
 | `rules[n].definition.actions.snapshot.delete` | `object` | Delete blob snapshot | N | |
 | `rules[n].definition.actions.snapshot.delete.daysAfterCreationGreaterThan` | `integer` | Integer value indicating the age in days | N | |
+| `rules[n].definition.filters` | `object` | Limit rule actions to a subset of blobs | N | |
+| `rules[n].definition.filters.blobTypes` | `array` | Restrict actions to this type of blob.  `blockBlob` is the only supported type | Y | `- blockBlob` |
+| `rules[n].definition.filters.prefixMatch` | `array` | An array of strings of prefixes to match | N |  |
+
 
 ##### Bind
 
@@ -506,6 +510,9 @@ Updates life cycle management policies within a GPv2 storage account.
 | `rules[n].definition.actions.snapshot` | `object` | Blob snapshot actions | N |
 | `rules[n].definition.actions.snapshot.delete` | `object` | Delete blob snapshot | N |
 | `rules[n].definition.actions.snapshot.delete.daysAfterCreationGreaterThan` | `integer` | Integer value indicating the age in days | N |
+| `rules[n].definition.filters` | `object` | Limit rule actions to a subset of blobs | N |
+| `rules[n].definition.filters.blobTypes` | `array` | Restrict actions to this type of blob.  `blockBlob` is the only supported type | Y | 
+| `rules[n].definition.filters.prefixMatch` | `array` | An array of strings of prefixes to match | N |
 ##### Deprovision
 
 Deletes the lifecycle policy from the storage account.
