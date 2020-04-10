@@ -95,20 +95,6 @@ func (s *server) update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var plan service.Plan
-	if updatingRequest.PlanID != "" {
-		plan, ok = svc.GetPlan(updatingRequest.PlanID)
-		if !ok {
-			logFields["serviceID"] = updatingRequest.ServiceID
-			logFields["planID"] = updatingRequest.PlanID
-			log.WithFields(logFields).Debug(
-				"bad updating request: invalid planID for service",
-			)
-			s.writeResponse(w, http.StatusBadRequest, generateInvalidPlanIDResponse())
-			return
-		}
-	}
-
 	instance, ok, err := s.store.GetInstance(instanceID)
 	if err != nil {
 		logFields["error"] = err
@@ -127,6 +113,36 @@ func (s *server) update(w http.ResponseWriter, r *http.Request) {
 		// TODO: Write a more detailed response
 		s.writeResponse(w, http.StatusBadRequest, generateEmptyResponse())
 		return
+	}
+
+	var plan service.Plan
+	var planID string
+	if updatingRequest.PlanID != "" {
+		plan, ok = svc.GetPlan(updatingRequest.PlanID)
+		planID = updatingRequest.PlanID
+		if !ok {
+			logFields["serviceID"] = updatingRequest.ServiceID
+			logFields["planID"] = planID
+			log.WithFields(logFields).Debug(
+				"bad updating request: invalid planID for service",
+			)
+			s.writeResponse(w, http.StatusBadRequest, generateInvalidPlanIDResponse())
+			return
+		}
+	} else {
+		// if the plan wasn't provided, then it's not changing, per the spec.  Retrieve
+		// the PlanID from the instance instead.
+		plan, ok = svc.GetPlan(instance.PlanID)
+		planID = instance.PlanID
+		if !ok {
+			logFields["serviceID"] = updatingRequest.ServiceID
+			logFields["planID"] = planID
+			log.WithFields(logFields).Error(
+				"pre-updating error: no Plan found for planID in Service",
+			)
+			s.writeResponse(w, http.StatusBadRequest, generateInvalidPlanIDResponse())
+			return
+		}
 	}
 
 	// Our broker doesn't actually require the serviceID and previousValues that,
@@ -233,7 +249,7 @@ func (s *server) update(w http.ResponseWriter, r *http.Request) {
 	// Wrap the updating parameters with a "params" object that guides access
 	// to the parameters using schema. This uses provisioning schema instead of
 	// updating schema so that when persisting, we will be able to persist the
-	// full combined provisioning + updating parameters instea of just the subset
+	// full combined provisioning + updating parameters instead of just the subset
 	// that are updating params.
 	pps := plan.GetSchemas().ServiceInstances.ProvisioningParametersSchema
 	updatingParameters := &service.ProvisioningParameters{
@@ -268,27 +284,10 @@ func (s *server) update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// If we get to here, we need to update the instance.
-
-	if plan == nil {
-		plan, ok = svc.GetPlan(instance.PlanID)
-		if !ok {
-			logFields["serviceID"] = updatingRequest.ServiceID
-			logFields["planID"] = instance.PlanID
-			log.WithFields(logFields).Error(
-				"pre-updating error: no Plan found for planID in Service",
-			)
-			s.writeResponse(
-				w,
-				http.StatusInternalServerError,
-				generateInvalidPlanIDResponse(),
-			)
-			return
-		}
-	}
 	updater, err := serviceManager.GetUpdater(plan)
 	if err != nil {
 		logFields["serviceID"] = updatingRequest.ServiceID
-		logFields["planID"] = updatingRequest.PlanID
+		logFields["planID"] = planID
 		logFields["error"] = err
 		log.WithFields(logFields).Error(
 			"pre-updating error: error retrieving updater for service and plan",
@@ -299,7 +298,7 @@ func (s *server) update(w http.ResponseWriter, r *http.Request) {
 	firstStepName, ok := updater.GetFirstStepName()
 	if !ok {
 		logFields["serviceID"] = updatingRequest.ServiceID
-		logFields["planID"] = updatingRequest.PlanID
+		logFields["planID"] = planID
 		log.WithFields(logFields).Error(
 			"pre-updating error: no steps found for updating service and plan",
 		)
@@ -308,7 +307,7 @@ func (s *server) update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	instance.Status = service.InstanceStateUpdating
-	instance.PlanID = updatingRequest.PlanID
+	instance.PlanID = planID
 	if err := s.store.WriteInstance(instance); err != nil {
 		logFields["error"] = err
 		log.WithFields(logFields).Error(
