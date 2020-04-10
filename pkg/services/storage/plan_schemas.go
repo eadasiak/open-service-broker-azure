@@ -32,6 +32,8 @@ func generateProvisioningParamsSchema(serviceName string) service.InputParameter
 				Description: "Name of the storage account.  Will be automatically " +
 					"generated if not supplied",
 				AllowedPattern: `^[a-z0-9]+$`,
+				MinLength:      ptr.ToInt(3),
+				MaxLength:      ptr.ToInt(24),
 			},
 			"enableNonHttpsTraffic": &service.StringPropertySchema{
 				Title:        "Enable non-https traffic",
