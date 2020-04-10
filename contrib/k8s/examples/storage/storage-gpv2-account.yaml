@@ -1,0 +1,16 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: sampleserviceeu2-storage-account
+  namespace: default
+spec:
+  clusterServiceClassExternalName: azure-storage-general-purpose-v2-storage-account
+  clusterServicePlanExternalName: account
+  parameters:
+    location: eastus2
+    resourceGroup: eu2-resource-group
+    alias: sampleserviceeu2
+    storageAccountName: sampleserviceeu2
+    enableNonHttpsTraffic: enabled
+    tags:
+      service: sampleserviceeu2
