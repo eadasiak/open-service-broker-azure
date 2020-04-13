@@ -75,7 +75,6 @@ func (i InputParametersSchema) MarshalJSON() ([]byte, error) {
 
 // Validate validates the given map[string]interface{} again this schema
 func (i InputParametersSchema) Validate(valMap map[string]interface{}) error {
-	fmt.Printf("validate parameters: %+v\n", valMap)
 	for _, requiredProperty := range i.RequiredProperties {
 		_, ok := valMap[requiredProperty]
 		if !ok {
