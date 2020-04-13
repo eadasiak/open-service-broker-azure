@@ -31,6 +31,3 @@ spec:
           prefixMatch:
             - container1/match1
             - container2/match2
-            
-
-

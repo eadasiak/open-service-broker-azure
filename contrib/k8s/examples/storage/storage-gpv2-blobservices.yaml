@@ -26,5 +26,3 @@ spec:
     deleteRetentionPolicy:
       enabled: "true"
       days: 42
-
-
