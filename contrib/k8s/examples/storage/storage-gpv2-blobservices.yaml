@@ -1,0 +1,28 @@
+apiVersion: servicecatalog.k8s.io/v1beta1
+kind: ServiceInstance
+metadata:
+  name: samplestorageeu2-gpv2-blobservices
+  namespace: default
+spec:
+  clusterServiceClassExternalName: azure-storage-blob-services
+  clusterServicePlanExternalName: blob-services
+  parameters:
+    location: eastus2
+    resourceGroup: eu2-resource-group
+    parentAlias: sampleserviceeu2
+    corsRules:
+    - allowedOrigins:
+      - https://mysite.com
+      - https://othersite.com
+      allowedMethods:
+      - GET
+      - POST
+      - PUT
+      maxAgeInSeconds: 630
+      exposedHeaders:
+      - X-Custom-Header
+      allowedHeaders:
+      - X-Other-Header
+    deleteRetentionPolicy:
+      enabled: "true"
+      days: 42

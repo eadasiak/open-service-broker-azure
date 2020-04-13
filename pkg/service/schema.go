@@ -64,8 +64,8 @@ func (i InputParametersSchema) MarshalJSON() ([]byte, error) {
 			Parameters inputParametersSchemaWrapper `json:"parameters"`
 		}{
 			Parameters: inputParametersSchemaWrapper{
-				Schema: jsonSchemaVersion,
-				Type:   "object",
+				Schema:                jsonSchemaVersion,
+				Type:                  "object",
 				inputParametersSchema: inputParametersSchema(i),
 				Additional:            false,
 			},
@@ -82,6 +82,12 @@ func (i InputParametersSchema) Validate(valMap map[string]interface{}) error {
 		}
 	}
 	for k, v := range valMap {
+		// Modules that use the parent-child module get this parameter passed
+		// when updating.  They should be ignored when validating the schema, as
+		// these parameters get injected automatically.
+		if k == "alias" || k == "parentAlias" {
+			continue
+		}
 		propertySchema, ok := i.PropertySchemas[k]
 		if !ok {
 			return NewValidationError(k, "unrecognized field")

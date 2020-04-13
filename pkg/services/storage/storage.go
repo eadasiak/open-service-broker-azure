@@ -1,17 +1,20 @@
 package storage
 
 import (
-	storageSDK "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2017-10-01/storage" // nolint: lll
+	storageSDK "github.com/Azure/azure-sdk-for-go/services/storage/mgmt/2019-04-01/storage" // nolint: lll
 	"github.com/Azure/open-service-broker-azure/pkg/azure/arm"
 	"github.com/Azure/open-service-broker-azure/pkg/service"
 )
 
 type module struct {
-	generalPurposeV1Manager *generalPurposeV1Manager
-	generalPurposeV2Manager *generalPurposeV2Manager
-	blobAccountManager      *blobAccountManager
-	blobContainerManager    *blobContainerManager
-	blobAllInOneManager     *blobAllInOneManager
+	generalPurposeV1Manager  *generalPurposeV1Manager
+	generalPurposeV2Manager  *generalPurposeV2Manager
+	blobAccountManager       *blobAccountManager
+	blobContainerManager     *blobContainerManager
+	blobAllInOneManager      *blobAllInOneManager
+	lifecyclePolicyManager   *lifecyclePolicyManager
+	blobServicesManager      *blobServicesManager
+	gpv2BlobContainerManager *gpv2BlobContainerManager
 }
 
 type storageManager struct {
@@ -35,8 +38,23 @@ type blobContainerManager struct {
 	storageManager
 }
 
+type gpv2BlobContainerManager struct {
+	armDeployer          arm.Deployer
+	blobContainersClient storageSDK.BlobContainersClient
+}
+
 type blobAllInOneManager struct {
 	storageManager
+}
+
+type lifecyclePolicyManager struct {
+	armDeployer  arm.Deployer
+	policyClient storageSDK.ManagementPoliciesClient
+}
+
+type blobServicesManager struct {
+	armDeployer        arm.Deployer
+	blobServicesClient storageSDK.BlobServicesClient
 }
 
 // New returns a new instance of a type that fulfills the service.Module
@@ -44,6 +62,9 @@ type blobAllInOneManager struct {
 func New(
 	armDeployer arm.Deployer,
 	accountsClient storageSDK.AccountsClient,
+	blobContainersClient storageSDK.BlobContainersClient,
+	blobServicesClient storageSDK.BlobServicesClient,
+	policyClient storageSDK.ManagementPoliciesClient,
 ) service.Module {
 	storageMgr := storageManager{
 		armDeployer:    armDeployer,
@@ -55,6 +76,18 @@ func New(
 		blobAccountManager:      &blobAccountManager{storageMgr},
 		blobContainerManager:    &blobContainerManager{storageMgr},
 		blobAllInOneManager:     &blobAllInOneManager{storageMgr},
+		gpv2BlobContainerManager: &gpv2BlobContainerManager{
+			armDeployer:          armDeployer,
+			blobContainersClient: blobContainersClient,
+		},
+		blobServicesManager: &blobServicesManager{
+			armDeployer:        armDeployer,
+			blobServicesClient: blobServicesClient,
+		},
+		lifecyclePolicyManager: &lifecyclePolicyManager{
+			armDeployer:  armDeployer,
+			policyClient: policyClient,
+		},
 	}
 }
 
