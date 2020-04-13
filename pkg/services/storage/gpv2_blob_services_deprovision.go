@@ -54,17 +54,17 @@ func (b *blobServicesManager) unsetBlobServices(
 	newCorsRules := new([]storageSDK.CorsRule)
 
 	// Reset all the settings to nil
-	if blobProperties.BlobServicePropertiesProperties.Cors.CorsRules != nil {
-		blobProperties.BlobServicePropertiesProperties.Cors.CorsRules = newCorsRules
+	if blobProperties.BlobServicePropertiesProperties.Cors.CorsRules != nil { // nolint: lll
+		blobProperties.BlobServicePropertiesProperties.Cors.CorsRules = newCorsRules // nolint: lll
 	}
-	if blobProperties.BlobServicePropertiesProperties.DeleteRetentionPolicy != nil {
-		*blobProperties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Enabled = false
+	if blobProperties.BlobServicePropertiesProperties.DeleteRetentionPolicy != nil { // nolint: lll
+		*blobProperties.BlobServicePropertiesProperties.DeleteRetentionPolicy.Enabled = false // nolint: lll
 	}
-	if blobProperties.BlobServicePropertiesProperties.DefaultServiceVersion != nil {
-		*blobProperties.BlobServicePropertiesProperties.DefaultServiceVersion = ""
+	if blobProperties.BlobServicePropertiesProperties.DefaultServiceVersion != nil { // nolint: lll
+		*blobProperties.BlobServicePropertiesProperties.DefaultServiceVersion = "" // nolint: lll
 	}
-	if blobProperties.BlobServicePropertiesProperties.AutomaticSnapshotPolicyEnabled != nil {
-		*blobProperties.BlobServicePropertiesProperties.AutomaticSnapshotPolicyEnabled = false
+	if blobProperties.BlobServicePropertiesProperties.AutomaticSnapshotPolicyEnabled != nil { // nolint: lll
+		*blobProperties.BlobServicePropertiesProperties.AutomaticSnapshotPolicyEnabled = false // nolint: lll
 	}
 
 	_, err = b.blobServicesClient.SetServiceProperties(

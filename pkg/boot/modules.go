@@ -243,26 +243,30 @@ func getModules(
 	storageAccountsClient.Authorizer = authorizer
 	storageAccountsClient.UserAgent = getUserAgent(storageAccountsClient.Client)
 
-	storageManagementPoliciesClient := storageSDK.NewManagementPoliciesClientWithBaseURI(
-		azureConfig.Environment.ResourceManagerEndpoint,
-		azureSubscriptionID,
-	)
+	storageManagementPoliciesClient :=
+		storageSDK.NewManagementPoliciesClientWithBaseURI(
+			azureConfig.Environment.ResourceManagerEndpoint,
+			azureSubscriptionID,
+		)
 	storageManagementPoliciesClient.Authorizer = authorizer
-	storageManagementPoliciesClient.UserAgent = getUserAgent(storageManagementPoliciesClient.Client)
+	storageManagementPoliciesClient.UserAgent =
+		getUserAgent(storageManagementPoliciesClient.Client)
 
 	storageBlobServicesClient := storageSDK.NewBlobServicesClientWithBaseURI(
 		azureConfig.Environment.ResourceManagerEndpoint,
 		azureSubscriptionID,
 	)
 	storageBlobServicesClient.Authorizer = authorizer
-	storageBlobServicesClient.UserAgent = getUserAgent(storageBlobServicesClient.Client)
+	storageBlobServicesClient.UserAgent =
+		getUserAgent(storageBlobServicesClient.Client)
 
 	storageBlobContainersClient := storageSDK.NewBlobContainersClientWithBaseURI(
 		azureConfig.Environment.ResourceManagerEndpoint,
 		azureSubscriptionID,
 	)
 	storageBlobContainersClient.Authorizer = authorizer
-	storageBlobContainersClient.UserAgent = getUserAgent(storageBlobContainersClient.Client)
+	storageBlobContainersClient.UserAgent =
+		getUserAgent(storageBlobContainersClient.Client)
 
 	modules := []service.Module{
 		postgresql.New(
@@ -303,7 +307,10 @@ func getModules(
 			sqlFailoverGroupsClient,
 		),
 		cosmosdb.New(armDeployer, cosmosdbAccountsClient),
-		storage.New(armDeployer, storageAccountsClient, storageBlobContainersClient, storageBlobServicesClient, storageManagementPoliciesClient),
+		storage.New(armDeployer, storageAccountsClient,
+			storageBlobContainersClient,
+			storageBlobServicesClient,
+			storageManagementPoliciesClient),
 		textanalytics.New(armDeployer, cognitiveClient),
 		iothub.New(armDeployer, iotHubClient),
 		appinsights.New(armDeployer, appInsightsClient, appInsightsAPIKeyClient),

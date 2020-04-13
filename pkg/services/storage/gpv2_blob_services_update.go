@@ -13,7 +13,9 @@ func (b *blobServicesManager) ValidateUpdatingParameters(
 	return nil
 }
 
-func (b *blobServicesManager) GetUpdater(service.Plan) (service.Updater, error) {
+func (b *blobServicesManager) GetUpdater(
+	service.Plan,
+) (service.Updater, error) {
 	return service.NewUpdater(
 		service.NewUpdatingStep("updateARMTemplate", b.updateARMTemplate),
 	)

@@ -11,8 +11,14 @@ func (l *lifecyclePolicyManager) GetDeprovisioner(
 	service.Plan,
 ) (service.Deprovisioner, error) {
 	return service.NewDeprovisioner(
-		service.NewDeprovisioningStep("deleteARMDeployment", l.deleteARMDeployment),
-		service.NewDeprovisioningStep("deleteLifecyclePolicy", l.deleteLifecyclePolicy),
+		service.NewDeprovisioningStep(
+			"deleteARMDeployment",
+			l.deleteARMDeployment,
+		),
+		service.NewDeprovisioningStep(
+			"deleteLifecyclePolicy",
+			l.deleteLifecyclePolicy,
+		),
 	)
 }
 

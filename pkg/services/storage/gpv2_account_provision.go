@@ -31,7 +31,9 @@ func (gpv2m *generalPurposeV2Manager) preProvision(
 		ARMDeploymentName:  uuid.NewV4().String(),
 		StorageAccountName: generate.NewIdentifier(),
 	}
-	requestedName := instance.ProvisioningParameters.GetString("storageAccountName")
+	requestedName := instance.ProvisioningParameters.GetString(
+		"storageAccountName",
+	)
 	if requestedName != "" {
 		nameAvailability, err := gpv2m.accountsClient.CheckNameAvailability(
 			ctx,

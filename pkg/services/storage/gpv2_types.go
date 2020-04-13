@@ -2,26 +2,26 @@ package storage
 
 import "github.com/Azure/open-service-broker-azure/pkg/service"
 
-func (l *lifecyclePolicyManager) GetEmptyInstanceDetails() service.InstanceDetails {
+func (l *lifecyclePolicyManager) GetEmptyInstanceDetails() service.InstanceDetails { // nolint: lll
 	return &instanceDetails{}
 }
 
-func (l *lifecyclePolicyManager) GetEmptyBindingDetails() service.BindingDetails {
+func (l *lifecyclePolicyManager) GetEmptyBindingDetails() service.BindingDetails { // nolint: lll
 	return nil
 }
 
-func (b *blobServicesManager) GetEmptyInstanceDetails() service.InstanceDetails {
+func (b *blobServicesManager) GetEmptyInstanceDetails() service.InstanceDetails { // nolint: lll
 	return &instanceDetails{}
 }
 
-func (b *blobServicesManager) GetEmptyBindingDetails() service.BindingDetails {
+func (b *blobServicesManager) GetEmptyBindingDetails() service.BindingDetails { // nolint: lll
 	return nil
 }
 
-func (b *gpv2BlobContainerManager) GetEmptyInstanceDetails() service.InstanceDetails {
+func (b *gpv2BlobContainerManager) GetEmptyInstanceDetails() service.InstanceDetails { // nolint: lll
 	return &instanceDetails{}
 }
 
-func (b *gpv2BlobContainerManager) GetEmptyBindingDetails() service.BindingDetails {
+func (b *gpv2BlobContainerManager) GetEmptyBindingDetails() service.BindingDetails { // nolint: lll
 	return nil
 }

@@ -13,7 +13,9 @@ func (l *lifecyclePolicyManager) ValidateUpdatingParameters(
 	return nil
 }
 
-func (l *lifecyclePolicyManager) GetUpdater(service.Plan) (service.Updater, error) {
+func (l *lifecyclePolicyManager) GetUpdater(
+	service.Plan,
+) (service.Updater, error) {
 	return service.NewUpdater(
 		service.NewUpdatingStep("updateARMTemplate", l.updateARMTemplate),
 	)

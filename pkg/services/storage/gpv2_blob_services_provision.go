@@ -36,7 +36,10 @@ func (b *blobServicesManager) deployARMTemplate(
 ) (service.InstanceDetails, error) {
 	dt := instance.Details.(*instanceDetails)
 
-	goTemplateParams := buildBlobServicesGoTemplate(instance, *instance.ProvisioningParameters)
+	goTemplateParams := buildBlobServicesGoTemplate(
+		instance,
+		*instance.ProvisioningParameters,
+	)
 	tagsObj := instance.ProvisioningParameters.GetObject("tags")
 	tags := make(map[string]string, len(tagsObj.Data))
 	for k := range tagsObj.Data {
@@ -76,6 +79,8 @@ func buildBlobServicesGoTemplate(
 	deleteRetentionPolicy := parameter.GetObject("deleteRetentionPolicy").Data
 	deleteRetentionPolicyBytes, _ := json.Marshal(deleteRetentionPolicy)
 	p["deleteRetentionPolicy"] = string(deleteRetentionPolicyBytes)
-	p["automaticSnapshotPolicyEnabled"] = parameter.GetString("automaticSnapshotPolicyEnabled")
+	p["automaticSnapshotPolicyEnabled"] = parameter.GetString(
+		"automaticSnapshotPolicyEnabled",
+	)
 	return p
 }

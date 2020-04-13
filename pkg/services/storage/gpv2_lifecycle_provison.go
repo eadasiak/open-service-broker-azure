@@ -37,7 +37,10 @@ func (l *lifecyclePolicyManager) deployARMTemplate(
 ) (service.InstanceDetails, error) {
 	dt := instance.Details.(*instanceDetails)
 
-	goTemplateParams := buildLifecycleGoTemplate(instance, *instance.ProvisioningParameters)
+	goTemplateParams := buildLifecycleGoTemplate(
+		instance,
+		*instance.ProvisioningParameters,
+	)
 	tagsObj := instance.ProvisioningParameters.GetObject("tags")
 	tags := make(map[string]string, len(tagsObj.Data))
 	for k := range tagsObj.Data {

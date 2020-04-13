@@ -73,7 +73,10 @@ func (b *gpv2BlobContainerManager) DeployARMTemplate(
 ) (service.InstanceDetails, error) {
 	dt := instance.Details.(*instanceDetails)
 
-	goTemplateParams := buildBlobContainerGoTemplate(instance, *instance.ProvisioningParameters)
+	goTemplateParams := buildBlobContainerGoTemplate(
+		instance,
+		*instance.ProvisioningParameters,
+	)
 	tagsObj := instance.ProvisioningParameters.GetObject("tags")
 	tags := make(map[string]string, len(tagsObj.Data))
 	for k := range tagsObj.Data {

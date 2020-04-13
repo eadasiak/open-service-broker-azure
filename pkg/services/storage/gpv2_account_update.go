@@ -24,7 +24,9 @@ func (gpv2m *generalPurposeV2Manager) ValidateUpdatingParameters(
 	return nil
 }
 
-func (gpv2m *generalPurposeV2Manager) GetUpdater(service.Plan) (service.Updater, error) {
+func (gpv2m *generalPurposeV2Manager) GetUpdater(
+	service.Plan,
+) (service.Updater, error) {
 	return service.NewUpdater(
 		service.NewUpdatingStep("updateARMTemplate", gpv2m.updateARMTemplate),
 	)

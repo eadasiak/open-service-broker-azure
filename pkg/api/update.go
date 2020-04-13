@@ -130,8 +130,8 @@ func (s *server) update(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		// if the plan wasn't provided, then it's not changing, per the spec.  Retrieve
-		// the PlanID from the instance instead.
+		// if the plan wasn't provided, then it's not changing, per the spec.
+		// Retrieve the PlanID from the instance instead.
 		plan, ok = svc.GetPlan(instance.PlanID)
 		planID = instance.PlanID
 		if !ok {

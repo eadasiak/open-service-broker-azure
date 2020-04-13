@@ -134,7 +134,9 @@ func generateBlobContainerProvisioningParamsSchema() service.InputParametersSche
 	}
 }
 
-func generateGPv2AccountProvisioningParamsSchema(serviceName string) service.InputParametersSchema {
+func generateGPv2AccountProvisioningParamsSchema(
+	serviceName string,
+) service.InputParametersSchema {
 	ips := service.InputParametersSchema{
 		RequiredProperties: []string{"location", "resourceGroup"},
 		PropertySchemas: map[string]service.PropertySchema{
@@ -176,7 +178,9 @@ func generateGPv2AccountProvisioningParamsSchema(serviceName string) service.Inp
 	return ips
 }
 
-func generateGPv2AccountUpdatingParamsSchema(serviceName string) service.InputParametersSchema {
+func generateGPv2AccountUpdatingParamsSchema(
+	serviceName string,
+) service.InputParametersSchema {
 	ips := service.InputParametersSchema{
 		RequiredProperties: []string{"location", "resourceGroup"},
 		PropertySchemas: map[string]service.PropertySchema{
@@ -586,7 +590,7 @@ func generateGPv2BlobServicesProvisioningParamsSchema() service.InputParametersS
 	return ips
 }
 
-func generateGPv2BlobServicesUpdatingParamsSchema() service.InputParametersSchema {
+func generateGPv2BlobServicesUpdatingParamsSchema() service.InputParametersSchema { // nolint: lll
 	ips := service.InputParametersSchema{
 		PropertySchemas: map[string]service.PropertySchema{
 			"resourceGroup": schemas.GetResourceGroupSchema(),
@@ -607,17 +611,20 @@ func generateGPv2BlobServicesUpdatingParamsSchema() service.InputParametersSchem
 					},
 					PropertySchemas: map[string]service.PropertySchema{
 						"allowedOrigins": &service.ArrayPropertySchema{
-							Title:       "Allowed Origins",
-							Description: "A list of origin domains that will be allowed via CORS, or '*' to allow all domains",
+							Title: "Allowed Origins",
+							Description: "A list of origin domains that will be allowed via CORS, " +
+								"or '*' to allow all domains",
 							ItemsSchema: &service.StringPropertySchema{
 								Description: "An individual domain that will be allowed via CORS",
 							},
 						},
 						"allowedMethods": &service.ArrayPropertySchema{
-							Title:       "Allowed Methods",
-							Description: "A list of HTTP methods that are allowed to be executed by the origin",
+							Title: "Allowed Methods",
+							Description: "A list of HTTP methods that are allowed to be executed " +
+								"by the origin",
 							ItemsSchema: &service.StringPropertySchema{
-								Description: "An individual HTTP method that will be allowed via CORS (uppercase only)",
+								Description: "An individual HTTP method that will be allowed " +
+									"via CORS (uppercase only)",
 								AllowedValues: []string{
 									"DELETE",
 									"GET",
@@ -630,21 +637,25 @@ func generateGPv2BlobServicesUpdatingParamsSchema() service.InputParametersSchem
 							},
 						},
 						"maxAgeInSeconds": &service.IntPropertySchema{
-							Title:       "Max Age in Seconds",
-							Description: "The number of seconds that the client/browser should cache a preflight response",
+							Title: "Max Age in Seconds",
+							Description: "The number of seconds that the client/browser " +
+								"should cache a preflight response",
 						},
 						"exposedHeaders": &service.ArrayPropertySchema{
 							Title:       "Exposed Headers",
 							Description: "A list of response headers to expose to CORS clients",
 							ItemsSchema: &service.StringPropertySchema{
-								Description: "An individual response header that will be exposed via CORS",
+								Description: "An individual response header that will be " +
+									"exposed via CORS",
 							},
 						},
 						"allowedHeaders": &service.ArrayPropertySchema{
-							Title:       "Allowed Headers",
-							Description: "A list of headers allowed to be part of the cross-origin request",
+							Title: "Allowed Headers",
+							Description: "A list of headers allowed to be part of the " +
+								"cross-origin request",
 							ItemsSchema: &service.StringPropertySchema{
-								Description: "An individual response header that will be included in the CORS request",
+								Description: "An individual response header that will be " +
+									"included in the CORS request",
 							},
 						},
 					},
@@ -655,15 +666,17 @@ func generateGPv2BlobServicesUpdatingParamsSchema() service.InputParametersSchem
 				Description: "The blob service properties for soft delete",
 				PropertySchemas: map[string]service.PropertySchema{
 					"enabled": &service.StringPropertySchema{
-						Title:         "Enabled",
-						Description:   "Indicates whether DeleteRetentionPolicy is enabled for the Blob service",
+						Title: "Enabled",
+						Description: "Indicates whether DeleteRetentionPolicy is enabled " +
+							"for the Blob service",
 						AllowedValues: []string{"true", "false"},
 					},
 					"days": &service.IntPropertySchema{
-						Title:       "Days",
-						Description: "Indicates the number of days that the deleted blob should be retained (1 to 365)",
-						MinValue:    ptr.ToInt64(1),
-						MaxValue:    ptr.ToInt64(365),
+						Title: "Days",
+						Description: "Indicates the number of days that the deleted blob " +
+							"should be retained (1 to 365)",
+						MinValue: ptr.ToInt64(1),
+						MaxValue: ptr.ToInt64(365),
 					},
 				},
 			},
@@ -677,7 +690,7 @@ func generateGPv2BlobServicesUpdatingParamsSchema() service.InputParametersSchem
 	return ips
 }
 
-func generateGPv2BlobContainerProvisioningParamsSchema() service.InputParametersSchema {
+func generateGPv2BlobContainerProvisioningParamsSchema() service.InputParametersSchema { // nolint: lll
 	return service.InputParametersSchema{
 		PropertySchemas: map[string]service.PropertySchema{
 			"resourceGroup": schemas.GetResourceGroupSchema(),
