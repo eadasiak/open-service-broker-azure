@@ -257,6 +257,13 @@ func getModules(
 	storageBlobServicesClient.Authorizer = authorizer
 	storageBlobServicesClient.UserAgent = getUserAgent(storageBlobServicesClient.Client)
 
+	storageBlobContainersClient := storageSDK.NewBlobContainersClientWithBaseURI(
+		azureConfig.Environment.ResourceManagerEndpoint,
+		azureSubscriptionID,
+	)
+	storageBlobContainersClient.Authorizer = authorizer
+	storageBlobContainersClient.UserAgent = getUserAgent(storageBlobContainersClient.Client)
+
 	modules := []service.Module{
 		postgresql.New(
 			armDeployer,
@@ -296,7 +303,7 @@ func getModules(
 			sqlFailoverGroupsClient,
 		),
 		cosmosdb.New(armDeployer, cosmosdbAccountsClient),
-		storage.New(armDeployer, storageAccountsClient, storageBlobServicesClient, storageManagementPoliciesClient),
+		storage.New(armDeployer, storageAccountsClient, storageBlobContainersClient, storageBlobServicesClient, storageManagementPoliciesClient),
 		textanalytics.New(armDeployer, cognitiveClient),
 		iothub.New(armDeployer, iotHubClient),
 		appinsights.New(armDeployer, appInsightsClient, appInsightsAPIKeyClient),

@@ -39,7 +39,8 @@ type blobContainerManager struct {
 }
 
 type gpv2BlobContainerManager struct {
-	storageManager
+	armDeployer          arm.Deployer
+	blobContainersClient storageSDK.BlobContainersClient
 }
 
 type blobAllInOneManager struct {
@@ -61,6 +62,7 @@ type blobServicesManager struct {
 func New(
 	armDeployer arm.Deployer,
 	accountsClient storageSDK.AccountsClient,
+	blobContainersClient storageSDK.BlobContainersClient,
 	blobServicesClient storageSDK.BlobServicesClient,
 	policyClient storageSDK.ManagementPoliciesClient,
 ) service.Module {
@@ -69,12 +71,15 @@ func New(
 		accountsClient: accountsClient,
 	}
 	return &module{
-		generalPurposeV1Manager:  &generalPurposeV1Manager{storageMgr},
-		generalPurposeV2Manager:  &generalPurposeV2Manager{storageMgr},
-		blobAccountManager:       &blobAccountManager{storageMgr},
-		blobContainerManager:     &blobContainerManager{storageMgr},
-		gpv2BlobContainerManager: &gpv2BlobContainerManager{storageMgr},
-		blobAllInOneManager:      &blobAllInOneManager{storageMgr},
+		generalPurposeV1Manager: &generalPurposeV1Manager{storageMgr},
+		generalPurposeV2Manager: &generalPurposeV2Manager{storageMgr},
+		blobAccountManager:      &blobAccountManager{storageMgr},
+		blobContainerManager:    &blobContainerManager{storageMgr},
+		blobAllInOneManager:     &blobAllInOneManager{storageMgr},
+		gpv2BlobContainerManager: &gpv2BlobContainerManager{
+			armDeployer:          armDeployer,
+			blobContainersClient: blobContainersClient,
+		},
 		blobServicesManager: &blobServicesManager{
 			armDeployer:        armDeployer,
 			blobServicesClient: blobServicesClient,

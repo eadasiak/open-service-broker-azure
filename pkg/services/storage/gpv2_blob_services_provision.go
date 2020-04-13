@@ -30,8 +30,6 @@ func (b *blobServicesManager) preProvision(
 	return &dt, nil
 }
 
-// TODO: add storage name verification
-
 func (b *blobServicesManager) deployARMTemplate(
 	_ context.Context,
 	instance service.Instance,
