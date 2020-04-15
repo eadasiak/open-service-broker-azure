@@ -3,6 +3,7 @@
 ################################################################################
 
 GIT_VERSION = $(shell git describe --always --abbrev=7 --dirty)
+ADOBE_VERSION ?= $(shell cat ./adobe-version)
 
 ifeq ($(REL_VERSION),)
 	BROKER_VERSION := devel
@@ -337,6 +338,12 @@ DOCKER_HELM_CMD := docker run \
 	-w /go/src/$(BASE_PACKAGE_NAME) \
 	$(HELM_IMAGE)
 
+BUILD_DOCKER_HELM_CMD := docker run \
+	--rm \
+	-v $$(pwd):/go/src/$(BASE_PACKAGE_NAME) \
+	-w /go/src/$(BASE_PACKAGE_NAME) \
+	$(HELM_IMAGE)
+
 LINT_CHART_CMD := helm lint contrib/k8s/charts/open-service-broker-azure \
 	--set azure.tenantId=foo \
 	--set azure.subscriptionId=foo \
@@ -398,6 +405,18 @@ PUBLISH_RELEASE_CHART_CMD := bash -c ' \
 		--file index.yaml \
 		--name index.yaml'
 
+BUILD_RELEASE_CHART_CMD := bash -c ' \
+	SIMPLE_REL_VERSION=$$(echo $(ADOBE_VERSION) | cut -c 2-) \
+	&& cd contrib/k8s/charts \
+	&& rm -rf repo \
+	&& mkdir repo \
+	&& cd repo \
+	&& sed -i "s/^version:.*/version: $${SIMPLE_REL_VERSION}/g" ../open-service-broker-azure/Chart.yaml \
+	&& sed -i "s/^appVersion:.*/appVersion: $${SIMPLE_REL_VERSION}/g" ../open-service-broker-azure/Chart.yaml \
+	&& sed -i "s/^  tag:.*/  tag: $(ADOBE_VERSION)/g" ../open-service-broker-azure/values.yaml \
+	&& helm dep build ../open-service-broker-azure \
+	&& helm package ../open-service-broker-azure' \
+
 .PHONY: publish-rc-chart
 publish-rc-chart:
 ifndef AZURE_STORAGE_CONNECTION_STRING
@@ -421,6 +440,17 @@ ifdef SKIP_DOCKER
 	$(PUBLISH_RELEASE_CHART_CMD)
 else
 	$(DOCKER_HELM_CMD) $(PUBLISH_RELEASE_CHART_CMD)
+endif
+
+.PHONY: build-release-chart
+build-release-chart:
+ifndef ADOBE_VERSION
+	$(error ADOBE_VERSION is undefined)
+endif
+ifdef SKIP_DOCKER
+	$(BUILD_RELEASE_CHART_CMD)
+else
+	$(BUILD_DOCKER_HELM_CMD) $(BUILD_RELEASE_CHART_CMD)
 endif
 
 ################################################################################
