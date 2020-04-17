@@ -329,7 +329,7 @@ endif
 # Chart-Related Targets                                                        #
 ################################################################################
 
-HELM_IMAGE := quay.io/deis/helm-chart-publishing-tools:v0.1.0
+HELM_IMAGE := quay.io/helmpack/chart-testing:latest
 
 DOCKER_HELM_CMD := docker run \
 	--rm \
@@ -405,7 +405,7 @@ PUBLISH_RELEASE_CHART_CMD := bash -c ' \
 		--file index.yaml \
 		--name index.yaml'
 
-BUILD_RELEASE_CHART_CMD := bash -c ' \
+BUILD_RELEASE_CHART_CMD := sh -c ' \
 	SIMPLE_REL_VERSION=$$(echo $(ADOBE_VERSION) | cut -c 2-) \
 	&& cd contrib/k8s/charts \
 	&& rm -rf repo \
@@ -414,6 +414,7 @@ BUILD_RELEASE_CHART_CMD := bash -c ' \
 	&& sed -i "s/^version:.*/version: $${SIMPLE_REL_VERSION}/g" ../open-service-broker-azure/Chart.yaml \
 	&& sed -i "s/^appVersion:.*/appVersion: $${SIMPLE_REL_VERSION}/g" ../open-service-broker-azure/Chart.yaml \
 	&& sed -i "s/^  tag:.*/  tag: $(ADOBE_VERSION)/g" ../open-service-broker-azure/values.yaml \
+	&& helm repo add kubernetes-charts https://kubernetes-charts.storage.googleapis.com/ \
 	&& helm dep build ../open-service-broker-azure \
 	&& helm package ../open-service-broker-azure' \
 
