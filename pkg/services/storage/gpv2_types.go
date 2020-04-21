@@ -25,3 +25,11 @@ func (b *gpv2BlobContainerManager) GetEmptyInstanceDetails() service.InstanceDet
 func (b *gpv2BlobContainerManager) GetEmptyBindingDetails() service.BindingDetails { // nolint: lll
 	return nil
 }
+
+func (a *generalPurposeV2Manager) GetEmptyInstanceDetails() service.InstanceDetails {
+	return &instanceDetails{}
+}
+
+func (a *generalPurposeV2Manager) GetEmptyBindingDetails() service.BindingDetails {
+	return nil
+}
