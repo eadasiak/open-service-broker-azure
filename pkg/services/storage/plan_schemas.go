@@ -225,6 +225,7 @@ func generateGPv2AccountUpdatingParamsSchema(
 // nolint: lll
 func generateLifecyclePolicyProvisioningParamsSchema() service.InputParametersSchema {
 	ips := service.InputParametersSchema{
+		RequiredProperties: []string{"location", "resourceGroup"},
 		PropertySchemas: map[string]service.PropertySchema{
 			"resourceGroup": schemas.GetResourceGroupSchema(),
 			"location":      schemas.GetLocationSchema(),
@@ -362,6 +363,7 @@ func generateLifecyclePolicyProvisioningParamsSchema() service.InputParametersSc
 // nolint: lll
 func generateLifecyclePolicyUpdatingParamsSchema() service.InputParametersSchema {
 	ips := service.InputParametersSchema{
+		RequiredProperties: []string{"location", "resourceGroup"},
 		PropertySchemas: map[string]service.PropertySchema{
 			"resourceGroup": schemas.GetResourceGroupSchema(),
 			"location":      schemas.GetLocationSchema(),
@@ -499,6 +501,7 @@ func generateLifecyclePolicyUpdatingParamsSchema() service.InputParametersSchema
 // nolint: lll
 func generateGPv2BlobServicesProvisioningParamsSchema() service.InputParametersSchema {
 	ips := service.InputParametersSchema{
+		RequiredProperties: []string{"location", "resourceGroup"},
 		PropertySchemas: map[string]service.PropertySchema{
 			"resourceGroup": schemas.GetResourceGroupSchema(),
 			"location":      schemas.GetLocationSchema(),
@@ -592,6 +595,7 @@ func generateGPv2BlobServicesProvisioningParamsSchema() service.InputParametersS
 
 func generateGPv2BlobServicesUpdatingParamsSchema() service.InputParametersSchema { // nolint: lll
 	ips := service.InputParametersSchema{
+		RequiredProperties: []string{"location", "resourceGroup"},
 		PropertySchemas: map[string]service.PropertySchema{
 			"resourceGroup": schemas.GetResourceGroupSchema(),
 			"location":      schemas.GetLocationSchema(),
@@ -692,6 +696,7 @@ func generateGPv2BlobServicesUpdatingParamsSchema() service.InputParametersSchem
 
 func generateGPv2BlobContainerProvisioningParamsSchema() service.InputParametersSchema { // nolint: lll
 	return service.InputParametersSchema{
+		RequiredProperties: []string{"location", "resourceGroup"},
 		PropertySchemas: map[string]service.PropertySchema{
 			"resourceGroup": schemas.GetResourceGroupSchema(),
 			"location":      schemas.GetLocationSchema(),
