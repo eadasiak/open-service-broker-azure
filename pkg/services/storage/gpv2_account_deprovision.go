@@ -12,12 +12,12 @@ func (gpv2m *generalPurposeV2Manager) GetDeprovisioner(
 ) (service.Deprovisioner, error) {
 	return service.NewDeprovisioner(
 		service.NewDeprovisioningStep(
-			"deleteARMDeployment",
-			gpv2m.deleteARMDeployment,
-		),
-		service.NewDeprovisioningStep(
 			"deleteStorageAccount",
 			gpv2m.deleteStorageAccount,
+		),
+		service.NewDeprovisioningStep(
+			"deleteARMDeployment",
+			gpv2m.deleteARMDeployment,
 		),
 	)
 }

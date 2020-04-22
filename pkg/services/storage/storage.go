@@ -27,7 +27,8 @@ type generalPurposeV1Manager struct {
 }
 
 type generalPurposeV2Manager struct {
-	storageManager
+	armDeployer    arm.Deployer
+	accountsClient storageSDK.AccountsClient
 }
 
 type blobAccountManager struct {
@@ -72,10 +73,13 @@ func New(
 	}
 	return &module{
 		generalPurposeV1Manager: &generalPurposeV1Manager{storageMgr},
-		generalPurposeV2Manager: &generalPurposeV2Manager{storageMgr},
 		blobAccountManager:      &blobAccountManager{storageMgr},
 		blobContainerManager:    &blobContainerManager{storageMgr},
 		blobAllInOneManager:     &blobAllInOneManager{storageMgr},
+		generalPurposeV2Manager: &generalPurposeV2Manager{
+			armDeployer: 		armDeployer,
+			accountsClient: accountsClient,
+		},
 		gpv2BlobContainerManager: &gpv2BlobContainerManager{
 			armDeployer:          armDeployer,
 			blobContainersClient: blobContainersClient,
