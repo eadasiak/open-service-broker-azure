@@ -70,7 +70,7 @@ var dbmsARMTemplateBytes = []byte(`
 						"location": "{{$root.location}}",
 						"name": "{{$rule.name}}",
 						"properties": {
-							"virtualNetworkSubnetId": "{{$rule.subnetId}}"
+							"virtualNetworkSubnetId": "[resourceId('{{ $root.virtualNetworkResourceGroup }}','Microsoft.Network/virtualNetworks/subnets', '{{ $root.virtualNetworkName }}', '{{ $rule.subnetName }}')]"
 						}
 					}{{if lt $i $virtualNetworkRulesCount}},{{end}}
 					{{end}}

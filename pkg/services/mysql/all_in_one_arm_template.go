@@ -43,7 +43,9 @@ var allInOneARMTemplateBytes = []byte(`
 			"tags": "[parameters('tags')]",
 			"resources": [
 				{{ $root := . }}
-				{{range .firewallRules}}
+				{{$firewallRulesCount := sub (len .firewallRules)  1}}
+				{{$virtualNetworkRulesCount := sub (len .virtualNetworkRules) 1 }}
+				{{range $i, $rule := .firewallRules}}
 				{
 					"type": "firewallrules",
 					"apiVersion": "[variables('DBforMySQLapiVersion')]",
@@ -51,26 +53,26 @@ var allInOneARMTemplateBytes = []byte(`
 						"Microsoft.DBforMySQL/servers/{{ $.serverName }}"
 					],
 					"location": "{{$root.location}}",
-					"name": "{{.name}}",
+					"name": "{{$rule.name}}",
 					"properties": {
-						"startIpAddress": "{{.startIPAddress}}",
-						"endIpAddress": "{{.endIPAddress}}"
+						"startIpAddress": "{{$rule.startIPAddress}}",
+						"endIpAddress": "{{$rule.endIPAddress}}"
+					}
+				}{{ if or (lt $i $firewallRulesCount) (gt $virtualNetworkRulesCount -1) }},{{end}}
+				{{end}}	
+				{{range $i, $rule := .virtualNetworkRules}}
+				{
+					"type": "virtualNetworkRules",
+					"apiVersion": "[variables('DBforMySQLapiVersion')]",
+					"dependsOn": [
+						"Microsoft.DBforMySQL/servers/{{ $.serverName }}"
+					],
+					"location": "{{$root.location}}",
+					"name": "{{$rule.name}}",
+					"properties": {
+						"virtualNetworkSubnetId": "[resourceId('{{ $root.virtualNetworkResourceGroup }}','Microsoft.Network/virtualNetworks/subnets', '{{ $root.virtualNetworkName }}', '{{ $rule.subnetName }}')]"
 					}
 				},
-				{{end}}
-				{{range .virtualNetworkRules}}
-  				{
-  					"type": "virtualNetworkRules",
-  					"apiVersion": "2017-12-01",
-  					"dependsOn": [
- 						"Microsoft.DBforMySQL/servers/{{ $.serverName }}"
-  					],
-  					"location": "{{$root.location}}",
-  					"name": "{{.name}}",
-  					"properties": {
-          				"virtualNetworkSubnetId": "{{.subnetId}}"
-  					}
-  				},
 				{{end}}
 				{
 					"apiVersion": "[variables('DBforMySQLapiVersion')]",

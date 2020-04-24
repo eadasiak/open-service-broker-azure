@@ -64,7 +64,8 @@ func buildGoTemplateParameters(
 		virtualNetworkRules[i] = virtualNetworkRulesParams.Data
 	}
 	p["virtualNetworkRules"] = virtualNetworkRules
-
+	p["virtualNetworkResourceGroup"] = pp.GetString("virtualNetworkResourceGroup")
+	p["virtualNetworkName"] = pp.GetString("virtualNetworkName")
 	return p, nil
 }
 
