@@ -44,7 +44,6 @@ func buildGoTemplateParameters(
 	p["version"] = version
 	p["serverName"] = dt.ServerName
 	p["administratorLogin"] = dt.AdministratorLogin
-	p["administratorLoginPassword"] = string(dt.AdministratorLoginPassword)
 	if isSSLRequired(pp) {
 		p["sslEnforcement"] = enabledARMString
 	} else {
@@ -66,6 +65,7 @@ func buildGoTemplateParameters(
 	p["virtualNetworkRules"] = virtualNetworkRules
 	p["virtualNetworkResourceGroup"] = pp.GetString("virtualNetworkResourceGroup")
 	p["virtualNetworkName"] = pp.GetString("virtualNetworkName")
+	// fmt.Printf("template params: %+v\n", p)
 	return p, nil
 }
 

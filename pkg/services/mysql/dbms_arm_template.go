@@ -8,6 +8,9 @@ var dbmsARMTemplateBytes = []byte(`
 		"parameters": {
 			"tags": {
 				"type": "object"
+			},
+			"administratorLoginPassword": {
+				"type": "securestring"
 			}
 		},
 		"variables": {
@@ -22,7 +25,7 @@ var dbmsARMTemplateBytes = []byte(`
 				"properties": {
 					"version": "{{.version}}",
 					"administratorLogin": "{{ .administratorLogin }}",
-					"administratorLoginPassword": "{{ .administratorLoginPassword }}",
+					"administratorLoginPassword": "[parameters('administratorLoginPassword')]",
 					"storageProfile": {
 						"storageMB": {{.storage}},
 						{{ if .geoRedundantBackup }}

@@ -54,13 +54,16 @@ func (d *dbmsManager) deployARMTemplate(
 	for k := range tagsObj.Data {
 		tags[k] = tagsObj.GetString(k)
 	}
+	armTemplateParameters := map[string]interface{}{
+		"administratorLoginPassword": dt.AdministratorLoginPassword,
+	}
 	outputs, err := d.armDeployer.Deploy(
 		dt.ARMDeploymentName,
 		instance.ProvisioningParameters.GetString("resourceGroup"),
 		instance.ProvisioningParameters.GetString("location"),
 		dbmsARMTemplateBytes,
 		goTemplateParameters,
-		map[string]interface{}{},
+		armTemplateParameters,
 		tags,
 	)
 	if err != nil {
