@@ -43,7 +43,7 @@ spec:
                 key: azure-client-secret
           - name: REDIS_HOST
             {{- if .Values.redis.embedded }}
-            value: {{ .Release.Name }}-redis
+            value: {{ .Release.Name }}-redis-master
             {{- else }}
             value: {{ required "A value is required for redis.host" .Values.redis.host }}
           - name: REDIS_PORT
