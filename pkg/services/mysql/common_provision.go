@@ -23,7 +23,6 @@ func buildGoTemplateParameters(
 	pp service.ProvisioningParameters,
 ) (map[string]interface{}, error) {
 	td := plan.GetProperties().Extended["tierDetails"].(tierDetails)
-
 	p := map[string]interface{}{}
 	location := pp.GetString("location")
 	p["location"] = location
@@ -49,13 +48,15 @@ func buildGoTemplateParameters(
 	} else {
 		p["sslEnforcement"] = disabledARMString
 	}
+	vnetConfig := pp.GetObject("virtualNetwork")
+	p["virtualNetworkResourceGroup"] = vnetConfig.GetString("resourceGroup")
+	p["virtualNetworkName"] = vnetConfig.GetString("name")
 	firewallRulesParams := pp.GetObjectArray("firewallRules")
 	firewallRules := make([]map[string]interface{}, len(firewallRulesParams))
 	for i, firewallRuleParams := range firewallRulesParams {
 		firewallRules[i] = firewallRuleParams.Data
 	}
 	p["firewallRules"] = firewallRules
-
 	virtualNetworkRulesParams := pp.GetObjectArray("virtualNetworkRules")
 	virtualNetworkRules := make([]map[string]interface{},
 		len(virtualNetworkRulesParams))
@@ -63,8 +64,8 @@ func buildGoTemplateParameters(
 		virtualNetworkRules[i] = virtualNetworkRulesParams.Data
 	}
 	p["virtualNetworkRules"] = virtualNetworkRules
-	p["virtualNetworkResourceGroup"] = pp.GetString("virtualNetworkResourceGroup")
-	p["virtualNetworkName"] = pp.GetString("virtualNetworkName")
+	// fmt.Printf("instance details: %+v\n", dt)
+	// fmt.Printf("provisioning parameters: %+v\n", pp)
 	// fmt.Printf("template params: %+v\n", p)
 	return p, nil
 }

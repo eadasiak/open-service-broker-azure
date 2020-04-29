@@ -40,6 +40,9 @@ func (d *dbmsManager) deployARMTemplate(
 ) (service.InstanceDetails, error) {
 	dt := instance.Details.(*dbmsInstanceDetails)
 	version := instance.Service.GetProperties().Extended["version"].(string)
+	armTemplateParameters := map[string]interface{}{
+		"administratorLoginPassword": string(dt.AdministratorLoginPassword),
+	}
 	goTemplateParameters, err := buildGoTemplateParameters(
 		instance.Plan,
 		version,
@@ -53,9 +56,6 @@ func (d *dbmsManager) deployARMTemplate(
 	tags := make(map[string]string, len(tagsObj.Data))
 	for k := range tagsObj.Data {
 		tags[k] = tagsObj.GetString(k)
-	}
-	armTemplateParameters := map[string]interface{}{
-		"administratorLoginPassword": dt.AdministratorLoginPassword,
 	}
 	outputs, err := d.armDeployer.Deploy(
 		dt.ARMDeploymentName,

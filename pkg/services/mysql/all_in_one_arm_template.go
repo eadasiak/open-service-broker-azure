@@ -9,7 +9,7 @@ var allInOneARMTemplateBytes = []byte(`
 		"tags": {
 			"type": "object"
 		},
-		"administratorLoginPassword" : {
+		"administratorLoginPassword": {
 			"type": "securestring"
 		}
 	},

@@ -46,6 +46,9 @@ func (a *allInOneManager) deployARMTemplate(
 ) (service.InstanceDetails, error) {
 	dt := instance.Details.(*allInOneInstanceDetails)
 	version := instance.Service.GetProperties().Extended["version"].(string)
+	armTemplateParameters := map[string]interface{}{
+		"administratorLoginPassword": string(dt.AdministratorLoginPassword),
+	}
 	goTemplateParameters, err := buildGoTemplateParameters(
 		instance.Plan,
 		version,
@@ -63,9 +66,6 @@ func (a *allInOneManager) deployARMTemplate(
 	tags := make(map[string]string, len(tagsObj.Data))
 	for k := range tagsObj.Data {
 		tags[k] = tagsObj.GetString(k)
-	}
-	armTemplateParameters := map[string]interface{}{
-		"administratorLoginPassword": dt.AdministratorLoginPassword,
 	}
 	// fmt.Printf("armTemplateParameters: %+v\n", armTemplateParameters)
 	outputs, err := a.armDeployer.Deploy(

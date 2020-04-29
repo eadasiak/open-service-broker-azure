@@ -26,6 +26,6 @@ func Render(tpl []byte, obj interface{}) ([]byte, error) {
 			err,
 		)
 	}
-	// fmt.Printf("template: %s", string(armTemplateBuffer.Bytes()))
+	fmt.Printf("template: %s", string(armTemplateBuffer.Bytes()))
 	return armTemplateBuffer.Bytes(), nil
 }

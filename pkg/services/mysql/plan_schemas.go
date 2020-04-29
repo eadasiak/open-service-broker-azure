@@ -43,6 +43,8 @@ func (t *tierDetails) getSku(pp service.ProvisioningParameters) string {
 }
 
 // nolint: lll
+// TODO: Fix the too-cute update vs. provisioning parameters crap that
+// causes inconsistent provisioning parameters results
 func generateProvisioningParamsSchema(
 	td tierDetails,
 ) service.InputParametersSchema {
@@ -65,8 +67,26 @@ func generateProvisioningParamsSchema(
 		// The server name can only contain lower case characters and numbers.
 		AllowedPattern: `^[a-z0-9]+$`,
 	}
+	ips.PropertySchemas["virtualNetwork"] = &service.ObjectPropertySchema{
+		Title: "Virtual Network Settings",
+		Description: "Virtual Network (vnet) settings",
+		PropertySchemas: map[string]service.PropertySchema{
+			"name": &service.StringPropertySchema{
+				Title:	"Virtual Network Name",
+				Description: "Name of the Virtual Network (vnet)",
+				MinLength:               ptr.ToInt(2),
+				MaxLength:               ptr.ToInt(80),
+			},
+			"resourceGroup": &service.StringPropertySchema{
+				Title:	"Virtual Network Resource Group",
+				Description: "Name of the Virtual Network's Resource Group",
+				MinLength:               ptr.ToInt(1),
+				MaxLength:               ptr.ToInt(63),
+			},
+		},
+	}
 	ips.PropertySchemas["adminAccountSettings"] = &service.ObjectPropertySchema{
-		Title:       "Admin Account Setttings",
+		Title:       "Admin Account Settings",
 		Description: "Settings of administrator account of MySQL server. Typically you do not need to specify this.",
 		PropertySchemas: map[string]service.PropertySchema{
 			"adminUsername": &service.StringPropertySchema{
@@ -94,6 +114,8 @@ func generateProvisioningParamsSchema(
 	return ips
 }
 
+// These all must have default values or they will not be used during the
+// provisioning step.
 func generateUpdatingParamsSchema(
 	td tierDetails,
 ) service.InputParametersSchema {
@@ -157,14 +179,6 @@ func generateUpdatingParamsSchema(
 					},
 					CustomPropertyValidator: firewallRuleValidator,
 				},
-			},
-			"virtualNetworkName": &service.StringPropertySchema{
-				Title:	"Virtual Network Name",
-				Description: "Name of the Virtual Network (vnet)",
-			},
-			"virtualNetworkResourceGroup": &service.StringPropertySchema{
-				Title:	"Virtual Network Resource Group",
-				Description: "Name of the Virtual Network's Resource Group",
 			},
 			"virtualNetworkRules": &service.ArrayPropertySchema{
 				Title:       "Virtual network rules",
