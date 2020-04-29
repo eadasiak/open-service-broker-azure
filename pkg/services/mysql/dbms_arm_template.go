@@ -3,11 +3,14 @@ package mysql
 // nolint: lll
 var dbmsARMTemplateBytes = []byte(`
 	{
-		"$schema": "http://schema.management.azure.com/schemas/2014-04-01-preview/deploymentTemplate.json#",
+		"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
 		"contentVersion": "1.0.0.0",
 		"parameters": {
 			"tags": {
 				"type": "object"
+			},
+			"administratorLoginPassword": {
+				"type": "securestring"
 			}
 		},
 		"variables": {
@@ -22,7 +25,7 @@ var dbmsARMTemplateBytes = []byte(`
 				"properties": {
 					"version": "{{.version}}",
 					"administratorLogin": "{{ .administratorLogin }}",
-					"administratorLoginPassword": "{{ .administratorLoginPassword }}",
+					"administratorLoginPassword": "[parameters('administratorLoginPassword')]",
 					"storageProfile": {
 						"storageMB": {{.storage}},
 						{{ if .geoRedundantBackup }}

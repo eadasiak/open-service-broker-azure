@@ -43,8 +43,9 @@ Provisions a new MySQL DBMS and a new database upon it. The new database will be
 | `firewallRules[n].name` | `string` | Specifies the name of the generated firewall rule |Y | |
 | `firewallRules[n].startIPAddress` | `string` | Specifies the start of the IP range allowed by this firewall rule | Y | |
 | `firewallRules[n].endIPAddress` | `string` | Specifies the end of the IP range allowed by this firewall rule | Y | |
-| `virtualNetworkName` | `string` | Specifies the Virtual Network the `VirtualNetworkRules` apply to | N | |
-| `virtualNetworkResourceGroup` | `string` | The Resource Group which the `virtualNetworkName` was provisioned into | N | |
+| `virtualNetwork` | `object` | Settings of the virtual network associated with this MySQL server.  These values are used when provisioning `virtualNetworkRules` | N | |
+| `virtualNetwork.name` | `string` | Specifies the Virtual Network the `VirtualNetworkRules` apply to | N | |
+| `virtualNetwork.resourceGroup` | `string` | The Resource Group which the `virtualNetworkName` was provisioned into | N | |
 | `virtualNetworkRules`  | `array` | Specifies the firewall rules to apply to the server. Definition follows. | N | `[]` Left unspecified, Firewall will default to only Azure IPs. If rules are provided, they must have valid values. |
 | `virtualNetworkRules[n].name` | `string` | Specifies the name of the generated virtual network rule |Y | |
 | `virtualNetworkRules[n].subnetName` | `string` | The full resource ID of a subnet in a virtual network to allow access from. | `tags` | `map[string]string` | Tags to be applied to new resources, specified as key/value pairs. | N | Tags (even if none are specified) are automatically supplemented with `heritage: open-service-broker-azure`. |

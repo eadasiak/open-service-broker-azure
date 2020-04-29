@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	log "github.com/Sirupsen/logrus"
 	mysqlSDK "github.com/Azure/azure-sdk-for-go/services/mysql/mgmt/2017-12-01/mysql" // nolint: lll
 	"github.com/Azure/open-service-broker-azure/pkg/generate"
 	"github.com/Azure/open-service-broker-azure/pkg/service"
@@ -23,7 +24,6 @@ func buildGoTemplateParameters(
 	pp service.ProvisioningParameters,
 ) (map[string]interface{}, error) {
 	td := plan.GetProperties().Extended["tierDetails"].(tierDetails)
-
 	p := map[string]interface{}{}
 	location := pp.GetString("location")
 	p["location"] = location
@@ -44,19 +44,20 @@ func buildGoTemplateParameters(
 	p["version"] = version
 	p["serverName"] = dt.ServerName
 	p["administratorLogin"] = dt.AdministratorLogin
-	p["administratorLoginPassword"] = string(dt.AdministratorLoginPassword)
 	if isSSLRequired(pp) {
 		p["sslEnforcement"] = enabledARMString
 	} else {
 		p["sslEnforcement"] = disabledARMString
 	}
+	vnetConfig := pp.GetObject("virtualNetwork")
+	p["virtualNetworkResourceGroup"] = vnetConfig.GetString("resourceGroup")
+	p["virtualNetworkName"] = vnetConfig.GetString("name")
 	firewallRulesParams := pp.GetObjectArray("firewallRules")
 	firewallRules := make([]map[string]interface{}, len(firewallRulesParams))
 	for i, firewallRuleParams := range firewallRulesParams {
 		firewallRules[i] = firewallRuleParams.Data
 	}
 	p["firewallRules"] = firewallRules
-
 	virtualNetworkRulesParams := pp.GetObjectArray("virtualNetworkRules")
 	virtualNetworkRules := make([]map[string]interface{},
 		len(virtualNetworkRulesParams))
@@ -64,8 +65,9 @@ func buildGoTemplateParameters(
 		virtualNetworkRules[i] = virtualNetworkRulesParams.Data
 	}
 	p["virtualNetworkRules"] = virtualNetworkRules
-	p["virtualNetworkResourceGroup"] = pp.GetString("virtualNetworkResourceGroup")
-	p["virtualNetworkName"] = pp.GetString("virtualNetworkName")
+	log.Debugf("instance details: %+v", dt)
+	log.Debugf("provisioning parameters: %+v\n", pp)
+	log.Debugf("template params: %+v\n", p)
 	return p, nil
 }
 

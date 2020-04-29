@@ -43,62 +43,68 @@ func (t *tierDetails) getSku(pp service.ProvisioningParameters) string {
 }
 
 // nolint: lll
+// TODO: Fix the too-cute update vs. provisioning parameters crap that
+// causes inconsistent provisioning parameters results
 func generateProvisioningParamsSchema(
 	td tierDetails,
 ) service.InputParametersSchema {
-	ips := generateUpdatingParamsSchema(td)
-	ips.RequiredProperties = append(ips.RequiredProperties, "location")
-	ips.PropertySchemas["location"] = schemas.GetLocationSchema()
-	ips.RequiredProperties = append(ips.RequiredProperties, "resourceGroup")
-	ips.PropertySchemas["resourceGroup"] = schemas.GetResourceGroupSchema()
-	ips.PropertySchemas["backupRedundancy"] = &service.StringPropertySchema{
-		Title:        "Backup redundancy",
-		Description:  "Specifies the backup redundancy",
-		OneOf:        td.allowedBackupRedundancy,
-		DefaultValue: "local",
-	}
-	ips.PropertySchemas["serverName"] = &service.StringPropertySchema{
-		Title:       "Server Name",
-		Description: "Name of the MySQL server",
-		MinLength:   ptr.ToInt(3),
-		MaxLength:   ptr.ToInt(63),
-		// The server name can only contain lower case characters and numbers.
-		AllowedPattern: `^[a-z0-9]+$`,
-	}
-	ips.PropertySchemas["adminAccountSettings"] = &service.ObjectPropertySchema{
-		Title:       "Admin Account Setttings",
-		Description: "Settings of administrator account of MySQL server. Typically you do not need to specify this.",
+	ips := service.InputParametersSchema{
+		RequiredProperties: []string{"location", "resourceGroup"},
 		PropertySchemas: map[string]service.PropertySchema{
-			"adminUsername": &service.StringPropertySchema{
-				Title:                   "Admin Username",
-				Description:             "The administrator username for the server.",
-				MinLength:               ptr.ToInt(1),
-				MaxLength:               ptr.ToInt(63),
-				CustomPropertyValidator: usernameValidator,
+			"resourceGroup": schemas.GetResourceGroupSchema(),
+			"location":      schemas.GetLocationSchema(),
+			"backupRedundancy": &service.StringPropertySchema{
+				Title:        "Backup redundancy",
+				Description:  "Specifies the backup redundancy",
+				OneOf:        td.allowedBackupRedundancy,
+				DefaultValue: "local",
 			},
-			"adminPassword": &service.StringPropertySchema{
-				Title:                   "Admin Password",
-				Description:             "The administrator password for the server. **Warning**: you may leak your password if you specify this property, others can see this password in your request body and `ServiceInstance` definition. DO NOT use this property unless you know what you are doing.",
-				MinLength:               ptr.ToInt(8),
-				MaxLength:               ptr.ToInt(128),
-				CustomPropertyValidator: passwordValidator,
+			"serverName": &service.StringPropertySchema{
+				Title:       "Server Name",
+				Description: "Name of the MySQL server",
+				MinLength:   ptr.ToInt(3),
+				MaxLength:   ptr.ToInt(63),
+				// The server name can only contain lower case characters and numbers.
+				AllowedPattern: `^[a-z0-9]+$`,
 			},
-		},
-	}
-	ips.PropertySchemas["tags"] = &service.ObjectPropertySchema{
-		Title: "Tags",
-		Description: "Tags to be applied to new resources," +
-			" specified as key/value pairs.",
-		Additional: &service.StringPropertySchema{},
-	}
-	return ips
-}
-
-func generateUpdatingParamsSchema(
-	td tierDetails,
-) service.InputParametersSchema {
-	return service.InputParametersSchema{
-		PropertySchemas: map[string]service.PropertySchema{
+			"virtualNetwork": &service.ObjectPropertySchema{
+				Title: "Virtual Network Settings",
+				Description: "Virtual Network (vnet) settings",
+				PropertySchemas: map[string]service.PropertySchema{
+					"name": &service.StringPropertySchema{
+						Title:	"Virtual Network Name",
+						Description: "Name of the Virtual Network (vnet)",
+						MinLength:               ptr.ToInt(2),
+						MaxLength:               ptr.ToInt(80),
+					},
+					"resourceGroup": &service.StringPropertySchema{
+						Title:	"Virtual Network Resource Group",
+						Description: "Name of the Virtual Network's Resource Group",
+						MinLength:               ptr.ToInt(1),
+						MaxLength:               ptr.ToInt(63),
+					},
+				},
+			},
+			"adminAccountSettings": &service.ObjectPropertySchema{
+				Title:       "Admin Account Settings",
+				Description: "Settings of administrator account of MySQL server. Typically you do not need to specify this.",
+				PropertySchemas: map[string]service.PropertySchema{
+					"adminUsername": &service.StringPropertySchema{
+						Title:                   "Admin Username",
+						Description:             "The administrator username for the server.",
+						MinLength:               ptr.ToInt(1),
+						MaxLength:               ptr.ToInt(63),
+						CustomPropertyValidator: usernameValidator,
+					},
+					"adminPassword": &service.StringPropertySchema{
+						Title:                   "Admin Password",
+						Description:             "The administrator password for the server. **Warning**: you may leak your password if you specify this property, others can see this password in your request body and `ServiceInstance` definition. DO NOT use this property unless you know what you are doing.",
+						MinLength:               ptr.ToInt(8),
+						MaxLength:               ptr.ToInt(128),
+						CustomPropertyValidator: passwordValidator,
+					},
+				},
+			},
 			"cores": &service.IntPropertySchema{
 				Title: "Cores",
 				Description: "Specifies vCores, which represent the logical " +
@@ -165,13 +171,158 @@ func generateUpdatingParamsSchema(
 					},
 				},
 			},
-			"virtualNetworkName": &service.StringPropertySchema{
-				Title:	"Virtual Network Name",
-				Description: "Name of the Virtual Network (vnet)",
+			"virtualNetworkRules": &service.ArrayPropertySchema{
+				Title:       "Virtual network rules",
+				Description: "Virtual network rules to apply to instance. ",
+				ItemsSchema: &service.ObjectPropertySchema{
+					Title:       "Virtual network rule",
+					Description: "Individual virtual network rule",
+					RequiredProperties: []string{
+						"name",
+						"subnetName",
+					},
+					PropertySchemas: map[string]service.PropertySchema{
+						"name": &service.StringPropertySchema{
+							Title:       "Name",
+							Description: "Name of virtual network rule",
+						},					
+						"subnetName": &service.StringPropertySchema{
+							Title:       "Subnet Name",
+							Description: "Name of the subnet in the Virtual Network",
+						},
+					},
+				},
 			},
-			"virtualNetworkResourceGroup": &service.StringPropertySchema{
-				Title:	"Virtual Network Resource Group",
-				Description: "Name of the Virtual Network's Resource Group",
+			"tags": &service.ObjectPropertySchema{
+				Title: "Tags",
+				Description: "Tags to be applied to new resources," +
+					" specified as key/value pairs.",
+				Additional: &service.StringPropertySchema{},
+			},
+		},
+	}
+	return ips
+}
+
+// These all must have default values or they will not be used during the
+// provisioning step.
+func generateUpdatingParamsSchema(
+	td tierDetails,
+) service.InputParametersSchema {
+	ips := service.InputParametersSchema{
+		PropertySchemas: map[string]service.PropertySchema{
+			"resourceGroup": schemas.GetResourceGroupSchema(),
+			"location":      schemas.GetLocationSchema(),
+			"backupRedundancy": &service.StringPropertySchema{
+				Title:        "Backup redundancy",
+				Description:  "Specifies the backup redundancy",
+				OneOf:        td.allowedBackupRedundancy,
+				DefaultValue: "local",
+			},
+			"serverName": &service.StringPropertySchema{
+				Title:       "Server Name",
+				Description: "Name of the MySQL server",
+				MinLength:   ptr.ToInt(3),
+				MaxLength:   ptr.ToInt(63),
+				// The server name can only contain lower case characters and numbers.
+				AllowedPattern: `^[a-z0-9]+$`,
+			},
+			"virtualNetwork": &service.ObjectPropertySchema{
+				Title: "Virtual Network Settings",
+				Description: "Virtual Network (vnet) settings",
+				PropertySchemas: map[string]service.PropertySchema{
+					"name": &service.StringPropertySchema{
+						Title:	"Virtual Network Name",
+						Description: "Name of the Virtual Network (vnet)",
+						MinLength:               ptr.ToInt(2),
+						MaxLength:               ptr.ToInt(80),
+					},
+					"resourceGroup": &service.StringPropertySchema{
+						Title:	"Virtual Network Resource Group",
+						Description: "Name of the Virtual Network's Resource Group",
+						MinLength:               ptr.ToInt(1),
+						MaxLength:               ptr.ToInt(63),
+					},
+				},
+			},
+			"adminAccountSettings": &service.ObjectPropertySchema{
+				Title:       "Admin Account Settings",
+				Description: "Settings of administrator account of MySQL server. Typically you do not need to specify this.",
+				PropertySchemas: map[string]service.PropertySchema{
+					"adminUsername": &service.StringPropertySchema{
+						Title:                   "Admin Username",
+						Description:             "The administrator username for the server.",
+						MinLength:               ptr.ToInt(1),
+						MaxLength:               ptr.ToInt(63),
+						CustomPropertyValidator: usernameValidator,
+					},
+					"adminPassword": &service.StringPropertySchema{
+						Title:                   "Admin Password",
+						Description:             "The administrator password for the server. **Warning**: you may leak your password if you specify this property, others can see this password in your request body and `ServiceInstance` definition. DO NOT use this property unless you know what you are doing.",
+						MinLength:               ptr.ToInt(8),
+						MaxLength:               ptr.ToInt(128),
+						CustomPropertyValidator: passwordValidator,
+					},
+				},
+			},
+			"cores": &service.IntPropertySchema{
+				Title: "Cores",
+				Description: "Specifies vCores, which represent the logical " +
+					"CPU of the underlying hardware",
+				AllowedValues: td.allowedCores,
+				DefaultValue:  ptr.ToInt64(td.defaultCores),
+			},
+			"storage": &service.IntPropertySchema{
+				Title:        "Storage",
+				Description:  "Specifies the storage in GBs",
+				DefaultValue: ptr.ToInt64(10),
+				MinValue:     ptr.ToInt64(5),
+				MaxValue:     ptr.ToInt64(td.maxStorage),
+			},
+			"backupRetention": &service.IntPropertySchema{
+				Title:        "Backup retention",
+				Description:  "Specifies the number of days for backup retention",
+				DefaultValue: ptr.ToInt64(7),
+				MinValue:     ptr.ToInt64(7),
+				MaxValue:     ptr.ToInt64(35),
+			},
+			"sslEnforcement": &service.StringPropertySchema{
+				Title: "SSL enforcement",
+				Description: "Specifies whether the server requires the use of TLS" +
+					" when connecting. Left unspecified, SSL will be enforced",
+				OneOf:        schemas.EnabledDisabledValues(),
+				DefaultValue: schemas.EnabledParamString,
+			},
+			"firewallRules": &service.ArrayPropertySchema{
+				Title: "Firewall rules",
+				Description: "Firewall rules to apply to instance. " +
+					"If left unspecified, defaults to only Azure IPs",
+				ItemsSchema: &service.ObjectPropertySchema{
+					Title:       "Firewall rule",
+					Description: "Individual Firewall Rule",
+					RequiredProperties: []string{
+						"name",
+						"startIPAddress",
+						"endIPAddress",
+					},
+					PropertySchemas: map[string]service.PropertySchema{
+						"name": &service.StringPropertySchema{
+							Title:       "Name",
+							Description: "Name of firewall rule",
+						},
+						"startIPAddress": &service.StringPropertySchema{
+							Title:                   "Start IP address",
+							Description:             "Start of firewall rule range",
+							CustomPropertyValidator: ipValidator,
+						},
+						"endIPAddress": &service.StringPropertySchema{
+							Title:                   "End IP address",
+							Description:             "End of firewall rule range",
+							CustomPropertyValidator: ipValidator,
+						},
+					},
+					CustomPropertyValidator: firewallRuleValidator,
+				},
 			},
 			"virtualNetworkRules": &service.ArrayPropertySchema{
 				Title:       "Virtual network rules",
@@ -195,8 +346,15 @@ func generateUpdatingParamsSchema(
 					},
 				},
 			},
+			"tags": &service.ObjectPropertySchema{
+				Title: "Tags",
+				Description: "Tags to be applied to new resources," +
+					" specified as key/value pairs.",
+				Additional: &service.StringPropertySchema{},
+			},
 		},
 	}
+	return ips
 }
 
 // nolint: lll
