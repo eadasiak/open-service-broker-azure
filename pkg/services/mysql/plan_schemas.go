@@ -163,6 +163,13 @@ func generateProvisioningParamsSchema(
 					},
 					CustomPropertyValidator: firewallRuleValidator,
 				},
+				DefaultValue: []interface{}{
+					map[string]interface{}{
+						"name":           "AllowAzure",
+						"startIPAddress": "0.0.0.0",
+						"endIPAddress":   "0.0.0.0",
+					},
+				},
 			},
 			"virtualNetworkRules": &service.ArrayPropertySchema{
 				Title:       "Virtual network rules",

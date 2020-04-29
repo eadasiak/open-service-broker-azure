@@ -67,7 +67,6 @@ func (a *allInOneManager) deployARMTemplate(
 	for k := range tagsObj.Data {
 		tags[k] = tagsObj.GetString(k)
 	}
-	// fmt.Printf("armTemplateParameters: %+v\n", armTemplateParameters)
 	outputs, err := a.armDeployer.Deploy(
 		dt.ARMDeploymentName,
 		instance.ProvisioningParameters.GetString("resourceGroup"),
