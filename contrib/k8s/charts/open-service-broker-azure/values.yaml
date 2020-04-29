@@ -79,7 +79,7 @@ redis:
   ## password the client will use. It must be the correct password for whatever
   ## external Redis server it connects to.
   ## DO NOT USE THIS DEFAULT VALUE IN PRODUCTION
-  password: password
+  redisPassword: password
   ## If not embedded, specifies whether to use a secure connection to the
   ## remote Redis host
   enableTls: true
