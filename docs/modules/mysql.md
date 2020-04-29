@@ -39,7 +39,7 @@ Provisions a new MySQL DBMS and a new database upon it. The new database will be
 | `adminAccountSettings.adminUsername` | `string` | The administrator username for the server. | N | "azureuser" |
 | `adminAccountSettings.adminPassword` | `string` | The administrator password for the server. **Warning**: you may leak your password if you specify this property, others can see this password in your request body and `ServiceInstance` definition. DO NOT use this property unless you know what you are doing. | N | A random generated password. |
 | `sslEnforcement` | `string` | Specifies whether the server requires the use of TLS when connecting. Valid valued are `""` (unspecified), `enabled`, or `disabled`. | N | `""`. Left unspecified, SSL _will_ be enforced. |
-| `firewallRules`  | `array` | Specifies the firewall rules to apply to the server. Definition follows. | N | `[]` Left unspecified, Firewall will default to none. If rules are provided, they must have valid values. |
+| `firewallRules`  | `array` | Specifies the firewall rules to apply to the server. Definition follows. | N | `[]` Left unspecified, Firewall will default to only Azure IPs. If rules are provided, they must have valid values. |
 | `firewallRules[n].name` | `string` | Specifies the name of the generated firewall rule |Y | |
 | `firewallRules[n].startIPAddress` | `string` | Specifies the start of the IP range allowed by this firewall rule | Y | |
 | `firewallRules[n].endIPAddress` | `string` | Specifies the end of the IP range allowed by this firewall rule | Y | |
