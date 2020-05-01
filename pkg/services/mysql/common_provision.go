@@ -65,9 +65,10 @@ func buildGoTemplateParameters(
 		virtualNetworkRules[i] = virtualNetworkRulesParams.Data
 	}
 	p["virtualNetworkRules"] = virtualNetworkRules
-	log.Debugf("instance details: %+v", dt)
-	log.Debugf("provisioning parameters: %+v\n", pp)
-	log.Debugf("template params: %+v\n", p)
+	// TODO: sanitize logs before emitting any of the following:
+	// log.Debugf("instance details: %+v", dt)
+	// log.Debugf("provisioning parameters: %+v\n", pp)
+	// log.Debugf("template params: %+v\n", p)
 	return p, nil
 }
 
